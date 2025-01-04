@@ -29,6 +29,8 @@ model User{
     credits Int @default(150)
 
     UserToProjects UserToProject[]
+
+    questionsAsked Question[]
 }
 
 //storing project details
@@ -48,6 +50,8 @@ model Project{
     commits Commit[]
 
     SourceCodeEmbeddings SourceCodeEmbedding[]
+
+    savedQuestions Question[]
 }
 
 //many-many relationship. 1 User can have many Projects. 1 Project can have many Users
@@ -99,4 +103,23 @@ model Commit{
 
     //ai summary
     summary String
+}
+
+
+// To save the question asked
+model Question{
+    id          String   @id @default(cuid())
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    question String
+    answer String
+
+    filesReferenced Json?
+
+    projectId   String
+    project     Project @relation(fields: [projectId], references: [id])
+
+    userId String
+    user User @relation(fields: [userId], references: [id])
 }
