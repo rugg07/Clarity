@@ -1,10 +1,13 @@
-import { User } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { TextareaDemo } from "./textarea-with-button";
 import { EmptyState } from "./empty-state";
 import {Image} from "lucide-react";
 
+import useProject from "@/hooks/use-project";
+import React from "react";
+
 function Feature() {
+  const {project} = useProject();
+  const [question, setQuestion] = React.useState("");
   return (
     <div className="w-full py-10">
       <div className="container mx-auto">

@@ -11,6 +11,7 @@ import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import CommitLog from "./commit-log";
 
 
 
@@ -75,7 +76,12 @@ const dashboardPage = () => {
                         <Feature />
                     </div>
                 </div>
-                <div className="h-4"></div>
+                <div className="flex w-full">
+                    <div className="my-8 w-full">
+                        <CommitLog />
+                    </div>
+                </div>
+                
                 {/* {projects?.projectName} */}
             </div>
             </HeroHighlight>

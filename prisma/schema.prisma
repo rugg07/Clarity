@@ -3,11 +3,14 @@
 
 generator client {
     provider = "prisma-client-js"
+    //to use pgvector plugin
+    previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
+    extensions = [vector]
 }
 
 model User{
@@ -43,6 +46,8 @@ model Project{
     UserToProjects UserToProject[]
 
     commits Commit[]
+
+    SourceCodeEmbeddings SourceCodeEmbedding[]
 }
 
 //many-many relationship. 1 User can have many Projects. 1 Project can have many Users
@@ -61,28 +66,22 @@ model UserToProject{
     @@unique([userId, projectId])
 }
 
-// model GithubUser{
-//     id          String   @id @default(cuid())
-//     createdAt   DateTime @default(now())
-//     updatedAt   DateTime @updatedAt
+// storing the Ai sumaary for each document -> create embedding of each ai sumaary and storing this within the DB
+model SourceCodeEmbedding{
+    id          String   @id @default(cuid())
 
-//     githubId    String @unique
-//     login       String
-//     name        String?
-//     avatarUrl   String?
-//     email       String?
-//     bio         String?
-//     location    String?
-//     twitter     String?
-//     websiteUrl  String?
-//     company     String?
-//     hireable    Boolean?
-//     followers   Int?
-//     following   Int?
-//     publicRepos Int?
-//     publicGists Int?
-//     lastSynced  DateTime?
-// }
+    //Using an embedding of 768 Dimension vector since this is the model used by Gemini
+    summaryEmbedding Unsupported("vector(768)")?
+    //source code
+    sourceCode String
+    fileName   String
+    //ai summary
+    summary String
+
+    //for 1 project
+    projectId   String
+    project     Project @relation(fields: [projectId], references: [id])
+}
 
 model Commit{
     id          String   @id @default(cuid())
