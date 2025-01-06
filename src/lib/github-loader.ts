@@ -92,7 +92,7 @@ export const loadGithubRepo = async (githubUrl: string, githubToken?: string) =>
 
 export const indexGithubRepo = async (projectId: string, githubUrl: string, githubToken?: string) => {
   const BATCH_SIZE = 5; // Process just 2 files at a time
-  const BATCH_DELAY = 30000; // 2 minutes between batches
+  const BATCH_DELAY = 30000; // 30 sec between batches
 
   try {
     // Check for existing embeddings first
