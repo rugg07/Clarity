@@ -24,9 +24,9 @@ function Feature() {
             </div>
           </div>
 
-          {/* "Pay Supplier Invoice" Section */}
+          {/* Meeting Section */}
           <div className="col-span-1 bg-muted rounded-md h-100 flex flex-col p-6">
-            <h3 className="text-xl tracking-tight">Create a new meeting !</h3>
+            <h3 className="text-xl tracking-tight">Add a new meeting!</h3>
               <p className="text-muted-foreground max-w-xs text-base">
                 Analyze your meeting with Clarity powered by AI
               </p>

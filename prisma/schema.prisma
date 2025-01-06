@@ -31,6 +31,8 @@ model User{
     UserToProjects UserToProject[]
 
     questionsAsked Question[]
+
+    Stripetransactions StripeTransaction[]
 }
 
 //storing project details
@@ -52,6 +54,8 @@ model Project{
     SourceCodeEmbeddings SourceCodeEmbedding[]
 
     savedQuestions Question[]
+
+    meetings Meeting[]
 }
 
 //many-many relationship. 1 User can have many Projects. 1 Project can have many Users
@@ -119,6 +123,58 @@ model Question{
 
     projectId   String
     project     Project @relation(fields: [projectId], references: [id])
+
+    userId String
+    user User @relation(fields: [userId], references: [id])
+}
+
+model Meeting{
+    id   String @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt   
+
+    name String
+
+    meetingUrl  String //firebase storage url
+
+    projectId String
+    project   Project @relation(fields: [projectId], references: [id])
+
+    status MeetingStatus @default(PROCESSING)
+    issues Issue[]
+}
+
+enum MeetingStatus{
+    PROCESSING
+    COMPLETED
+}
+
+model Issue{
+    id       String @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    start    String
+    end      String
+    gist     String
+    headline String
+    summary  String
+
+    meetingId String
+    meeting   Meeting @relation(fields: [meetingId], references: [id])
+}
+
+model StripeTransaction{
+    id          String   @id @default(cuid())
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    credits      Int
+    // currency    String
+    // paymentId   String
+    // paymentStatus String
+    // paymentMethod String
+    // paymentDate DateTime
 
     userId String
     user User @relation(fields: [userId], references: [id])

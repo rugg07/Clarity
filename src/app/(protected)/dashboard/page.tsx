@@ -12,6 +12,9 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import CommitLog from "./commit-log";
+import ArchiveButton from "./archive-button";
+import InviteButton from "./invite-button";
+import TeamMembers from "./team-members";
 
 
 
@@ -55,19 +58,14 @@ const dashboardPage = () => {
                             </Link>
                         )}
                     </div>
-                    <div className="flex items-center gap-4 px-4 py-3">
-                        {/* user logo */}
-                        <div className="pr-2 pt-2">
-                            <UserButton />
-                        </div>
+                    <div className="flex items-center gap-4 mr-4">
+                        {/* Team Members */}
+                            <TeamMembers/>
                         {/* collaborate button */}
-                        <div>
-                            <Button>Invite a Team Member!</Button>
-                        </div>
+                            <InviteButton/>
                         {/* archive button */}
-                        <div>
-                            <Button>Archive</Button>
-                        </div>
+                            <ArchiveButton />
+                       
                     </div>
                 </div>
                 {/* card display */}

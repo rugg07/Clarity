@@ -3,6 +3,50 @@ import {GithubRepoLoader} from '@langchain/community/document_loaders/web/github
 import {Document} from '@langchain/core/documents'
 import { generateEmbedding, summarizeCode } from './gemini';
 import { db } from '@/server/db';
+import { Octokit } from '@octokit/rest';
+
+export const getFileCount = async (path: string, octokit: Octokit, githubOwner: string, githubRepo: string, acc: number = 0) => {
+  //recursive: to get all files in the repo, acc: to keep track of the number of files
+  const {data} = await octokit.rest.repos.getContent({
+    owner: githubOwner,
+    repo: githubRepo,
+    path
+  })
+  if(!Array.isArray(data) && data.type === 'file'){
+    return acc + 1
+  }
+  if(Array.isArray(data)){
+    let fileCount = 0
+    const directories: string [] = []
+    for (const item of data){
+      if(item.type === 'file'){
+        fileCount++
+      } else if(item.type === 'dir'){
+        directories.push(item.path)
+      }
+    }
+
+    if(directories.length > 0){
+      const directoryCounts = await Promise.all(
+        directories.map(dirPath => getFileCount(dirPath, octokit, githubOwner, githubRepo, 0))
+      )
+      fileCount += directoryCounts.reduce((acc, count) => acc + count, 0)
+    }
+    return acc + fileCount
+  }
+  return acc
+}
+export const checkCredits = async(githubUrl: string, githubToken?: string) => {
+  // find out how many files are in the repo
+  const octokit = new Octokit({auth: githubToken})
+  const githubOwner = githubUrl.split('/')[3]
+  const githubRepo = githubUrl.split('/')[4]
+  if(!githubOwner || !githubRepo){
+    return 0
+  }
+  const fileCount = await getFileCount('', octokit, githubOwner, githubRepo, 0)
+  return fileCount
+}
 
 export const loadGithubRepo = async (githubUrl: string, githubToken?: string) => {
     const branches = ['main', 'master']; // List of branches to try
@@ -45,36 +89,81 @@ export const loadGithubRepo = async (githubUrl: string, githubToken?: string) =>
   
     return docs;
   };
-  
-//   // Example usage:
-//   console.log(
-//     await loadGithubRepo("https://github.com/rugg07/Web3.0-Final", process.env.GITHUB_TOKEN)
-//   );
-export const indexGithubRepo = async (projectId: string ,githubUrl: string, githubToken?: string) => {
+
+export const indexGithubRepo = async (projectId: string, githubUrl: string, githubToken?: string) => {
+  const BATCH_SIZE = 5; // Process just 2 files at a time
+  const BATCH_DELAY = 30000; // 2 minutes between batches
+
+  try {
+    // Check for existing embeddings first
+    const existingEmbeddings = await db.sourceCodeEmbedding.findMany({
+      where: { projectId },
+      select: { fileName: true }
+    });
+    const processedFiles = new Set(existingEmbeddings.map(e => e.fileName));
+
     const docs = await loadGithubRepo(githubUrl, githubToken);
-    const allEmbeddings = await generateEmbeddings(docs);
-    await Promise.allSettled(allEmbeddings.map(async (embedding, index) => {
-        console.log(`processing ${index} embedding of ${allEmbeddings.length}`)
-        if(!embedding) return
-        const sourceCodeEmbedding = await db.sourceCodeEmbedding.create({
-            // insert row first without vector then update it with vector (SQL query below)
+    const remainingDocs = docs.filter(doc => !processedFiles.has(doc.metadata.source));
+    
+    console.log(`Found ${remainingDocs.length} files to process out of ${docs.length} total files`);
+
+    for (let i = 0; i < remainingDocs.length; i += BATCH_SIZE) {
+      const batch = remainingDocs.slice(i, i + BATCH_SIZE);
+      console.log(`Processing batch ${Math.floor(i/BATCH_SIZE) + 1} of ${Math.ceil(remainingDocs.length/BATCH_SIZE)}`);
+
+      for (const doc of batch) {
+        try {
+          const summary = await summarizeCode(doc);
+          const embedding = await generateEmbedding(summary);
+
+          // Insert row first without vector
+          await db.sourceCodeEmbedding.create({
             data: {
-                projectId,
-                fileName: embedding.fileName,
-                sourceCode: embedding.sourceCode,
-                summary: embedding.summary
+              // projectId,
+              fileName: doc.metadata.source,
+              sourceCode: doc.pageContent,
+              summary,
+              project: {
+                connect: { id: projectId }
+              }
             }
-        })
-        // embedding.embedding is the vector. Cant put vector directly in data{} since it is not supported yet so we need to write raw sql query
-        await db.$executeRaw`
-        UPDATE "SourceCodeEmbedding" 
-        SET "summaryEmbedding" = ${embedding.embedding}::vector 
-        WHERE "id" = ${sourceCodeEmbedding.id}
-        `
-    }))
-}
+          });
 
+          // Then update with vector data
+          const createdEmbedding = await db.sourceCodeEmbedding.findFirst({
+            where: {
+              projectId,
+              fileName: doc.metadata.source
+            },
+            // orderBy: { createdAt: 'desc' }
+          });
 
+          if (createdEmbedding) {
+            await db.$executeRaw`
+              UPDATE "SourceCodeEmbedding"
+              SET "summaryEmbedding" = ${embedding}::vector
+              WHERE "id" = ${createdEmbedding.id}
+            `;
+            console.log(`Successfully processed ${doc.metadata.source}`);
+          }
+        } catch (error) {
+          console.error(`Failed to process ${doc.metadata.source}:`, error);
+          // Continue with next file even if this one fails
+        }
+      }
+
+      if (i + BATCH_SIZE < remainingDocs.length) {
+        console.log(`Waiting ${BATCH_DELAY/1000} seconds before next batch...`);
+        await new Promise(resolve => setTimeout(resolve, BATCH_DELAY));
+      }
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error in indexGithubRepo:', error);
+    throw error;
+  }
+};
 // 1. Look through files -Generate Ai summary of file
 // 2. Take summary and create vector embedding of it
 const generateEmbeddings = async (docs: Document[]) => {

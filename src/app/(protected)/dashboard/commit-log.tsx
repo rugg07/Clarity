@@ -20,11 +20,11 @@ const CommitLog = () => {
                             'absolute left-0 top-2 flex w-6 justify-center'
                         )}
                         >
-                            <div className='w-px translate-x-2.5 bg-gray-200 -mb-2'></div>
+                            <div className='w-px translate-x-2.5 bg-gray-300 -mb-2'></div>
                         </div>
                         <>
                             <img src={commit.commitAuthorAvatar} alt='commit avatar' className='relative mt-2 size-8 flex-none bg-gray-500 w-12 h-12 rounded-full' />
-                            <div className='flex-auto rounded-mg bg-white p-3 ring-1 ring-inset ring-gray-200'>
+                            <div className='flex-auto rounded-mg bg-white p-3 ring-1 ring-inset ring-gray-300 rounded-sm'>
                                 <div className='flex justify-between gap-x-4'>
                                     <Link target='_blank' href={`${project?.repoUrl}/commits/${commit.commitHash}`} className='py-0.5 text-xs leading-5 text-gray-500'>
                                         <span className='font-medium text-gray-900'>

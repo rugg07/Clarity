@@ -14,6 +14,8 @@ import { Button } from "./button";
 import CodesReferenced from "@/app/(protected)/dashboard/codes-referenced";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
+import { useTheme } from "next-themes";
+import useRefetch from "@/hooks/use-refetch";
 
 
 function TextareaDemo() {
@@ -24,6 +26,7 @@ function TextareaDemo() {
   const [filesReferenced, setFilesReferenced] = React.useState<{ fileName: string; sourceCode: string; summary: string }[]>([]);
   const [answer, setAnswer] = React.useState("")
   const saveAnswer = api.project.saveAnswer.useMutation()
+  const {theme} = useTheme()
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setAnswer("")
@@ -42,10 +45,12 @@ function TextareaDemo() {
     setLoading(false)
   }
 
+  const refetch = useRefetch()
+
   return (
-    <div className="pt-2 h-4/5 w-full">
+    <div className="pt-2 h-4/5">
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-[80vw]">
+        <DialogContent className='sm:max-w-[80vw]'>
           <DialogHeader>
             <div className="flex items-center gap-2">
               <DialogTitle>
@@ -59,7 +64,10 @@ function TextareaDemo() {
                   filesReferenced
                 },
                   {
-                    onSuccess:()=>{toast.success("Answer saved successfully")},
+                    onSuccess:()=>{
+                      toast.success("Answer saved successfully")
+                      refetch()
+                    },
                     onError:()=>{toast.error("Failed to save answer")}
                   }
                 )
@@ -69,14 +77,15 @@ function TextareaDemo() {
             </div>
           </DialogHeader>
 
-          <MDEditor.Markdown source={answer} className="max-w-[70vw] !h-full max-h-[40vh] overflow-scroll"/>
-          <div className="h-4"></div>
+          {/* <MDEditor.Markdown source={answer} className="max-w-[70vw] !h-full max-h-[40vh] overflow-scroll" /> */}
+          <MDEditor.Markdown source={answer} className={cn("max-w-[70vw] !h-full max-h-[40vh] overflow-scroll p-2 rounded-lg",{"bg-gray-500": theme === "light", "bg-gray-50": theme === "dark"})}/>
+          <div className="h-1"></div>
           <CodesReferenced filesReferenced={filesReferenced}/>
-          <Button type='button' onClick={() => setOpen(false)}>Close</Button>
+          <Button type='button' onClick={() => setOpen(false)} className="max-w-[70vw]">Close</Button>
         </DialogContent>
       </Dialog>
       <form onSubmit={onSubmit}>
-        <Textarea id="textarea-12" placeholder="Leave a comment" value={question} onChange={e=>setQuestion(e.target.value)}  className="w-full h-[250px] border-2 border-gray-500"/>
+        <Textarea id="textarea-12" placeholder="Ask away ..." value={question} onChange={e=>setQuestion(e.target.value)}  className="w-full h-[250px] border-2 border-gray-500"/>
           <div className="z-10 flex mt-9 items-center justify-center">
             <AnimatedGradientText type="submit" disabled={loading}>
               🎉 <hr className="mx-2 h-4 w-px shrink-0 bg-gray-300" />{" "}

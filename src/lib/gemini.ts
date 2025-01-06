@@ -40,50 +40,69 @@ export const summarizeCommitContent = async (diff: string) => {
     return response.response.text()
 }
 
-export async function summarizeCode(doc: Document) {
-    console.log("getting summary for", doc.metadata.source);
-    try {
-        const code = doc.pageContent.slice(0,10000); // Limiting to 10k characters
-        const response = await model.generateContent([
-            `You are an expert programmer, and an intelligent senior software engineer who specialises in onboarding junior software engineers onto projects.
-            You are onboarding a junior software engineer and explaining to them the purpose of the ${doc.metadata.source} file.
-            Here is the code -
-            -------
-            ${code}
-            -------
-            Give a summary no more than 100 words of the code above`,
-        ]);
+export async function summarizeCode(doc: Document): Promise<string> {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const MAX_RETRIES = 3;
+    const RETRY_DELAY = 60000; // 1 minute
+  
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        const code = doc.pageContent.slice(0, 10000);
+        const prompt = `You are an expert programmer, and an intelligent senior software engineer who specializes in onboarding junior software engineers onto projects.
+                       You are onboarding a junior software engineer and explaining to them the purpose of the ${doc.metadata.source} file.
+                       Here is the code -
+                       
+                       ${code}
+                       
+                       Give a summary no more than 100 words of the code above`;
+  
+        const response = await model.generateContent({
+          contents: [{
+            role: 'user',
+            parts: [{ text: prompt }]
+          }]
+        });
+  
         return response.response.text();
-    } catch (error) {
-        throw new Error(`Failed to summarize code: ${error}`);
+      } catch (error: any) {
+        console.log(`Attempt ${attempt + 1} failed for ${doc.metadata.source}`);
+        
+        if (error.message?.includes('429') && attempt < MAX_RETRIES - 1) {
+          console.log(`Rate limited, waiting ${RETRY_DELAY/1000} seconds before retry...`);
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+          continue;
+        }
+        throw error;
+      }
     }
-}
-
-// export async function generateEmbedding (summary: string) {
-//     // Generate embedding of the text
-//     const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
-//     const result = await model.embedContent(summary);
-//     const embedding = result.embedding;
-//     return embedding.values
-// }
-
-export async function generateEmbedding(summary: string): Promise<number[]> {
+  
+    throw new Error(`Failed to summarize after ${MAX_RETRIES} attempts`);
+  }
+  
+  export async function generateEmbedding(summary: string): Promise<number[]> {
     const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
-
-    return await retryWithBackoff(async () => {
+    const MAX_RETRIES = 3;
+    const RETRY_DELAY = 60000; // 1 minute
+  
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
         const result = await model.embedContent(summary);
-        return result.embedding.values;
-    });
-}
-
-
-//include retries in case of a temporary failure
-const retryWithBackoff = async <T>(fn: () => Promise<T>, retries = 5, delayMs = 1000): Promise<T> => {
-    try {
-        return await fn();
-    } catch (error) {
-        if (retries === 0) throw error;
-        await new Promise(resolve => setTimeout(resolve, delayMs));
-        return retryWithBackoff(fn, retries - 1, delayMs * 2);
+        const embedding = result.embedding;
+        if (!embedding) {
+          throw new Error('No embedding generated');
+        }
+        return embedding.values;
+      } catch (error: any) {
+        console.log(`Attempt ${attempt + 1} failed for embedding generation`);
+        
+        if (error.message?.includes('429') && attempt < MAX_RETRIES - 1) {
+          console.log(`Rate limited, waiting ${RETRY_DELAY/1000} seconds before retry...`);
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+          continue;
+        }
+        throw error;
+      }
     }
-};
+  
+    throw new Error(`Failed to generate embedding after ${MAX_RETRIES} attempts`);
+  }

@@ -30,9 +30,9 @@ const layout = ({children} : Props) => {
             </SidebarInset>
             {/* <AppSidebar /> */}
             {/* main page */}
-            <main className='w-full m-2'>
+            <main className='w-full'>
                 {/* Navbar */}
-                <div className='flex items-center gap-2 border-sidebard-border bg-sidebar border shadow rounded md-2 p-x-4'>
+                <div className='flex items-center gap-2 border-sidebard-border bg-sidebar border shadow rounded md-2 p-x-4 ml-4 mr-4 mt-2 mb-2'>
                     {/* <SearchBar/> */}
                     <div className='ml-auto'></div>
                     <UserButton />
