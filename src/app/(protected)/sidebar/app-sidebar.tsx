@@ -62,20 +62,6 @@ const items = [
     },
 ]
 
-// const projects = [
-//   {
-//     name: "Design Engineering",
-//     url: "#",
-//   },
-//   {
-//     name: "Sales & Marketing",
-//     url: "#",
-//   },
-//   {
-//     name: "Travel",
-//     url: "#",
-//   },
-// ]
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -87,7 +73,7 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader>
         <div className="flex flex-row gap-0.5">
-          <Image src='/mintlify.svg' width={50} height={50} alt='Mintlify Logo'/>
+          <Image src='/mintlify.svg' width={30} height={30} alt='Mintlify Logo' className="m-2"/>
           {open && (<span className={cn("font-bold text-3xl pt-2",{
               "!text-white": theme === "dark",
               "!text-black ": theme === "light" 
