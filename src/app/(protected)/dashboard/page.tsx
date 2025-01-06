@@ -13,8 +13,10 @@ import Link from "next/link";
 import React from "react";
 import CommitLog from "./commit-log";
 import ArchiveButton from "./archive-button";
-import InviteButton from "./invite-button";
+// import InviteButton from "./invite-button";
+const InviteButton = dynamic(() => import('./invite-button'), {ssr: false}); //remove window is not defined error
 import TeamMembers from "./team-members";
+import dynamic from "next/dynamic";
 
 
 
