@@ -26,22 +26,23 @@ const config = {
     ignoreBuildErrors: true,
   },
   transpilePackages: ["@trpc/server", "@trpc/client"],
-  webpack: (/** @type {{ resolve: { fallback: any; alias: any; }; }} */ config) => {
+  webpack: (/** @type {{ resolve: { fallback: any; alias: { '@': string; }; }; }} */ config) => {
     config.resolve.fallback = {
       ...config.resolve.fallback,
       fs: false,
     };
     config.resolve.alias = {
-      ...config.resolve.alias,
       '@': '/src',
     };
     return config;
   },
-  // Additional settings for proper module resolution
   experimental: {
+    serverActions: {
+      bodySizeLimit: '2mb',
+      maxDuration: 60,
+    },
     esmExternals: 'loose',
   },
-  // Ensure proper handling of external packages
   modularizeImports: {
     '@radix-ui/react-*': {
       transform: '@radix-ui/react-{{member}}',

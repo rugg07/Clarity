@@ -57,12 +57,12 @@ export function CardWithForm() {
   }
   const hasEnoughCredits = checkCredits?.data?.userCredits ? checkCredits.data.fileCount <= checkCredits.data.userCredits : true;
   
-  // Also log the current state
-  console.log('Current checkCredits state:', {
-    data: checkCredits.data,
-    isPending: checkCredits.isPending,
-    error: checkCredits.error
-  });
+  // // Also log the current state
+  // console.log('Current checkCredits state:', {
+  //   data: checkCredits.data,
+  //   isPending: checkCredits.isPending,
+  //   error: checkCredits.error
+  // });
 
 
   return (
