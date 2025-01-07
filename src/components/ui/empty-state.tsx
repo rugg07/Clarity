@@ -88,7 +88,7 @@ export function EmptyState({
         // Upload to Firebase with logging
         console.log('Starting Firebase upload...');
         const downloadUrl = await uploadFile(file as File, setProgress) as string;
-        console.log('Firebase upload successful:', downloadUrl);
+        // console.log('Firebase upload successful:', downloadUrl);
         
         // Update database with detailed error handling
         try {
@@ -97,7 +97,7 @@ export function EmptyState({
             meetingUrl: downloadUrl,
             name: file.name
           });
-          console.log('Database upload successful:', meeting);
+          console.log('Database upload successful:');
     
           toast.success("Meeting uploaded successfully!");
           router.push('/meeting');

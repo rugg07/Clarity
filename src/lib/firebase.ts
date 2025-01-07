@@ -86,16 +86,24 @@ import {getDownloadURL, getStorage, ref, uploadBytesResumable} from 'firebase/st
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// const firebaseConfig = {
+//   apiKey: "AIzaSyBboEC6Vn2fERbfA0FuFovOR-bI1wTj_B8",
+//   authDomain: "clarity-440f3.firebaseapp.com",
+//   projectId: "clarity-440f3",
+//   storageBucket: "clarity-440f3.firebasestorage.app",
+//   messagingSenderId: "1059108994292",
+//   appId: "1:1059108994292:web:1038512c7da7efb21a72a1",
+//   measurementId: "G-5VHM5B7T71"
+// };
 const firebaseConfig = {
-  apiKey: "AIzaSyBboEC6Vn2fERbfA0FuFovOR-bI1wTj_B8",
-  authDomain: "clarity-440f3.firebaseapp.com",
-  projectId: "clarity-440f3",
-  storageBucket: "clarity-440f3.firebasestorage.app",
-  messagingSenderId: "1059108994292",
-  appId: "1:1059108994292:web:1038512c7da7efb21a72a1",
-  measurementId: "G-5VHM5B7T71"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_MEASUREMENT_ID
 };
-
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const storage = getStorage(app)

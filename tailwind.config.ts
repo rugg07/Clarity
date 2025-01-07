@@ -145,6 +145,14 @@ export default {
   				to: {
   					backgroundPosition: 'var(--bg-size) 0'
   				}
+  			},
+  			aurora: {
+  				from: {
+  					backgroundPosition: '50% 50%, 50% 50%'
+  				},
+  				to: {
+  					backgroundPosition: '350% 50%, 350% 50%'
+  				}
   			}
   		},
   		animation: {
@@ -155,7 +163,8 @@ export default {
   			shine: 'shine var(--duration) infinite linear',
   			'shimmer-slide': 'shimmer-slide var(--speed) ease-in-out infinite alternate',
   			'spin-around': 'spin-around calc(var(--speed) * 2) infinite linear',
-  			gradient: 'gradient 8s linear infinite'
+  			gradient: 'gradient 8s linear infinite',
+  			aurora: 'aurora 60s linear infinite'
   		}
   	}
   },

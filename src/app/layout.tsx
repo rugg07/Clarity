@@ -26,7 +26,11 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
 
-    <ClerkProvider>
+    <ClerkProvider 
+      afterSignOutUrl="/landing"
+      signUpUrl="/sign-up"
+      signInUrl="/sign-in"
+    >
       <html lang="en" className={`${GeistSans.variable}`}>
         <body>
           <ThemeProvider
