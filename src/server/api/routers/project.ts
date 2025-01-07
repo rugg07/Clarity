@@ -97,6 +97,18 @@ createProject: protectedProcedure.input(
             }
         })
     }),
+    // uploadMeeting: protectedProcedure.input(z.object({projectId: z.string(), meetingUrl: z.string(), name: z.string()}))
+    // .mutation(async({ctx, input})=>{
+    //     const meeting = await ctx.db.meeting.create({
+    //         data:{
+    //             meetingUrl: input.meetingUrl,
+    //             name: input.name,
+    //             projectId: input.projectId,
+    //             status: 'PROCESSING'
+    //         }
+    //     })
+    //     return meeting
+    // }),
     uploadMeeting: protectedProcedure.input(z.object({projectId: z.string(), meetingUrl: z.string(), name: z.string()}))
     .mutation(async({ctx, input})=>{
         const meeting = await ctx.db.meeting.create({

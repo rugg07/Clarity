@@ -53,29 +53,75 @@ export function EmptyState({
     },
     multiple: false,
     maxSize: 50_000_000, //50MB
+    // onDrop: async acceptedFiles => {
+    //   setIsUploading(true)
+    //   console.log(acceptedFiles)
+    //   const file = acceptedFiles[0]
+    //   if (!file) return
+    //   const downloadUrl = await uploadFile(file as File, setProgress) as string
+    //   uploadMeeting.mutate({
+    //     projectId: project!.id,
+    //     meetingUrl: downloadUrl,
+    //     name: file.name
+    //   },{
+    //     onSuccess: (meeting) => {
+    //       toast.success("Meeting uploaded successfully!")
+    //       router.push('/meeting')
+    //       proccessingMeeting.mutateAsync({meetingUrl: downloadUrl, meetingId: meeting.id, projectId: project!.id})
+    //     },
+    //     onError: (error) => {
+    //       toast.error("Failed to upload meeting")
+    //     }
+    //   })
+    //   window.alert(`File uploaded successfully! Download URL: ${downloadUrl}`)
+    //   setIsUploading(false)
+    // },
+
+
     onDrop: async acceptedFiles => {
-      setIsUploading(true)
-      console.log(acceptedFiles)
-      const file = acceptedFiles[0]
-      if (!file) return
-      const downloadUrl = await uploadFile(file as File, setProgress) as string
-      uploadMeeting.mutate({
-        projectId: project!.id,
-        meetingUrl: downloadUrl,
-        name: file.name
-      },{
-        onSuccess: (meeting) => {
-          toast.success("Meeting uploaded successfully!")
-          router.push('/meeting')
-          proccessingMeeting.mutateAsync({meetingUrl: downloadUrl, meetingId: meeting.id, projectId: project!.id})
-        },
-        onError: (error) => {
-          toast.error("Failed to upload meeting")
+      // Insert the new code here, replacing the existing onDrop function
+      try {
+        setIsUploading(true);
+        const file = acceptedFiles[0];
+        if (!file) return;
+    
+        // Upload to Firebase with logging
+        console.log('Starting Firebase upload...');
+        const downloadUrl = await uploadFile(file as File, setProgress) as string;
+        console.log('Firebase upload successful:', downloadUrl);
+        
+        // Update database with detailed error handling
+        try {
+          const meeting = await uploadMeeting.mutateAsync({
+            projectId: project!.id,
+            meetingUrl: downloadUrl,
+            name: file.name
+          });
+          console.log('Database upload successful:', meeting);
+    
+          toast.success("Meeting uploaded successfully!");
+          router.push('/meeting');
+          
+          // Process meeting after successful database upload
+          await proccessingMeeting.mutateAsync({
+            meetingUrl: downloadUrl,
+            meetingId: meeting.id,
+            projectId: project!.id
+          });
+        } catch (dbError) {
+          console.error('Database error:', dbError);
+          console.log('Project ID:', project?.id);
+          console.log('Meeting URL:', downloadUrl);
+          console.log('File name:', file.name);
+          throw dbError; // Re-throw to be caught by outer try-catch
         }
-      })
-      window.alert(`File uploaded successfully! Download URL: ${downloadUrl}`)
-      setIsUploading(false)
-    },
+      } catch (error) {
+        toast.error("Failed to upload meeting");
+        console.error('Upload process error:', error);
+      } finally {
+        setIsUploading(false);
+      }
+    }
   })
   return (
     <div className="bg-background border-border hover:border-border/80 text-center border-2 border-dashed rounded-xl p-14 w-full max-w-[620px] group transition duration-500 hover:duration-200" {...getRootProps()}>
