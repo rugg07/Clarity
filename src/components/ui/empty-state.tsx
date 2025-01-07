@@ -162,7 +162,7 @@ export function EmptyState({
                 "border-gray-300 hover:text-black", { "hover:text-white": theme === "dark"}
               )}
             >
-              {/* {action.label} */}Upload Images
+              {/* {action.label} */}Upload Meetings
               <input className="hidden" {...getInputProps()} />
             </Button>
           </>

@@ -30,11 +30,11 @@ const MeetingPage = () => {
             </p>
             <div className="h-8"></div>
             <EmptyState
-              title="No Images"
-              description="Upload images to get started with your gallery."
+              title="No Videos"
+              description="Upload audio files to analyze your meetings."
               icons={[Image]}
               action={{
-                label: "Upload Images",
+                label: "Upload Meetings",
                 onClick: () => console.log("Upload clicked"),
               }}
             />
