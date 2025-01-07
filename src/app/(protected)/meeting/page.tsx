@@ -45,7 +45,7 @@ const MeetingPage = () => {
         {isLoading && <div>Loading...</div>}
         <ul className='divide-y divide-gray-200 m-4'>
             {meetings?.map(meeting => (
-              <li key={meeting.id} className='py-4 flex items-center justify-between p-5 gap-x-6 bg-muted rounded-lg'>
+              <li key={meeting.id} className='py-4 flex items-center justify-between p-5 gap-x-6 bg-muted rounded-lg my-4'>
                 <div>
                   <div className='min-w-0'>
                     <div className='flex items-center gap-2'>
