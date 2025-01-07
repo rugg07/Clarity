@@ -15,7 +15,7 @@ type Response = {
   commitDate: string;
 };
 
-const githubUrl = "https://github.com/rugg07/Web3.0-Final";
+// const githubUrl = "https://github.com/rugg07/Web3.0-Final";
 
 //Get all commit details
 export const getCommitHashes = async (githubUrl: string) => {
@@ -46,7 +46,39 @@ export const getCommitHashes = async (githubUrl: string) => {
 
 // console.log(await getCommitHashes(githubUrl))
 
-export const pollCommits = async (projectId: string) => {
+// export const pollCommits = async (projectId: string) => {
+//     const {project, githubUrl} = await fetchProjectsGithubUrl(projectId)
+//     const commitHashes = await getCommitHashes(githubUrl)
+//     //checking if we have already saved the commit to the db - Dont want to generate ai summary everytime
+//     const unprocessedCommits = await filterUnproccessedCommits(projectId, commitHashes)
+//     const summaryResponses = await Promise.allSettled(unprocessedCommits.map((commit) => {
+//         return summarizeCommit(githubUrl, commit.commitHash)
+//     }))
+//     const summaries = summaryResponses.map((response)=>{
+//         if (response.status === 'fulfilled') {
+//             return response.value as string;
+//         }
+//         return ""
+//     })
+//     //save summaries to the db
+//     const commits = await db.commit.createMany({
+//         data: summaries.map((summary, index) => {
+//             console.log(`processing commit ${index}`)
+//             return {
+//                 // ! - for what definitely exists. ? - for what might not exist
+//                 projectId: projectId,
+//                 commitHash: unprocessedCommits[index]!.commitHash,
+//                 commitMessage: unprocessedCommits[index]!.commitMessage,
+//                 commitAuthorName: unprocessedCommits[index]!.commitAuthorName,
+//                 commitAuthorAvatar: unprocessedCommits[index]!.commitAuthorAvatar,
+//                 commitDate: unprocessedCommits[index]!.commitDate,
+//                 summary: summary
+//             }
+//         })
+//     })
+//     return commits
+// }
+export const pollCommits = async (projectId: string, userId: string) => {
     const {project, githubUrl} = await fetchProjectsGithubUrl(projectId)
     const commitHashes = await getCommitHashes(githubUrl)
     //checking if we have already saved the commit to the db - Dont want to generate ai summary everytime

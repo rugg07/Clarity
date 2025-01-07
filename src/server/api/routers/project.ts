@@ -38,7 +38,7 @@ createProject: protectedProcedure.input(
             }
         })
         await indexGithubRepo(project.id, input.githubUrl, input.githubToken)
-        await pollCommits(project.id)
+        await pollCommits(project.id, ctx.user.userId!)
         await ctx.db.user.update({where: {id: ctx.user.userId!}, data: {credits: {decrement: fileCount}}})
         return project
     }),
@@ -56,16 +56,43 @@ createProject: protectedProcedure.input(
         })
     }),
     //get all commits for a specific project
+    // getCommits: protectedProcedure.input(z.object({
+    //     projectId: z.string()
+    // })).query(async({ctx, input})=>{
+    //     //fetch new commits, if new commits present summarize it
+    //     pollCommits(input.projectId).then().catch(console.error)
+    //     return await ctx.db.commit.findMany({
+    //         where:{
+    //             projectId: input.projectId
+    //         }
+    //     })
+    // }),
     getCommits: protectedProcedure.input(z.object({
         projectId: z.string()
-    })).query(async({ctx, input})=>{
-        //fetch new commits, if new commits present summarize it
-        pollCommits(input.projectId).then().catch(console.error)
+      })).query(async({ctx, input})=>{
+        // First verify user has access to this project
+        const project = await ctx.db.project.findFirst({
+          where: {
+            id: input.projectId,
+            UserToProjects: {
+              some: {
+                userId: ctx.user.userId!
+              }
+            },
+            deletedAt: null
+          }
+        });
+      
+        if (!project) {
+          throw new Error("Project not found or user doesn't have access");
+        }
+      
+        // Then get commits
         return await ctx.db.commit.findMany({
-            where:{
-                projectId: input.projectId
-            }
-        })
+          where:{
+            projectId: input.projectId
+          }
+        });
     }),
     saveAnswer: protectedProcedure.input(z.object({
         projectId: z.string(),

@@ -60,7 +60,7 @@ const dashboardPage = () => {
                             </Link>
                         )}
                     </div>
-                    <div className="flex items-center gap-4 mr-4">
+                    <div className="flex items-center gap-4 mr-4 mt-4">
                         {/* Team Members */}
                             <TeamMembers/>
                         {/* collaborate button */}

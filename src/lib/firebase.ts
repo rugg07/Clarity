@@ -107,7 +107,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const storage = getStorage(app)
-console.log('Firebase Storage bucket:', storage.app.options.storageBucket);
+// console.log('Firebase Storage bucket:', storage.app.options.storageBucket);
 // setProgress is to keep track of % of file uploaded
 export async function uploadFile(file: File, setProgress?: (progress: number) => void) {
     return new Promise((result, reject) => {
