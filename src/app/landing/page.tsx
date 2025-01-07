@@ -24,14 +24,14 @@ const LandingPage = () => {
             <div className="text-center">
                 <Button
                     onClick={() => router.push('/sign-in')}
-                    className="text-white mx-4 my-2 rounded-sm transition-colors w-[120px]"
+                    className="text-black bg-white hover:bg-gray-400 hover:text-black mx-4 my-2 rounded-sm transition-colors w-[120px]"
                 >
                     Sign In
                 </Button>
                 <Button
                     variant={'secondary'}
                     onClick={() => router.push('/sign-up')}
-                    className="text-black mx-4 my-2 rounded-sm transition-colors w-[120px]"
+                    className="text-white bg-gray-900 hover:bg-gray-700 mx-4 my-2 rounded-sm transition-colors w-[120px]"
                 >
                     Sign Up
                 </Button>
@@ -42,9 +42,9 @@ const LandingPage = () => {
             <ContainerScroll
                 titleComponent={
                 <>
-                    <h1 className="text-4xl font-semibold text-black dark:text-white">
-                    Development needs<br />
-                    <span className="text-4xl md:text-[6rem] font-bold mt-1 leading-none">
+                    <h1 className="text-4xl font-semibold text-white">
+                    All your development needs<br />
+                    <span className="text-4xl md:text-[6rem] font-bold mt-1 leading-none text-white">
                         Made Easy
                     </span>
                     </h1>
