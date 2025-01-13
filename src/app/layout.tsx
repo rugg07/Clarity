@@ -14,6 +14,7 @@ import {
   UserButton
 } from '@clerk/nextjs'
 import { ThemeProvider } from "./_components/theme-provider";
+import LandingPage from "./landing/page";
 
 export const metadata: Metadata = {
   title: "Clarity",

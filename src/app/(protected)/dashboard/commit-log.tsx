@@ -6,17 +6,39 @@ import { ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react'
 
+interface Commit {
+  id: string;
+  commitHash: string;
+  commitMessage: string;
+  commitAuthorName: string;
+  commitAuthorAvatar: string;
+  commitDate: Date;
+  summary: string;
+}
+
+interface CommitData {
+  commits: Commit[];
+  totalPages: number;
+  currentPage: number;
+  totalCommits: number;
+}
+
 const CommitLog = () => {
-    const {projectId, project} = useProject();
-    const {data: commits} = api.project.getCommits.useQuery({projectId});
+  const { projectId, project } = useProject();
+  const { data } = api.project.getCommits.useQuery(
+    { projectId, page: 1 },
+    { enabled: !!projectId }
+  ) as { data: CommitData | undefined };
+
+  if (!data?.commits) return <div className='font-semibold text-xl pl-8'>No commits found</div>;
   return (
     <>
         <ul className='space-y-6 w-full'>
-            {commits?.map((commit, commitIdx) => {
+            {data.commits?.map((commit, commitIdx) => {
                 return (
                     <li key={commit.id} className='relative flex gap-x-4 mx-4'>
                         <div className={cn(
-                            commitIdx === commits.length-1 ? 'h-6' : '-bottom-6',
+                            commitIdx === data.commits.length-1 ? 'h-6' : '-bottom-6',
                             'absolute left-0 top-2 flex w-6 justify-center'
                         )}
                         >
